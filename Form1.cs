@@ -1564,25 +1564,51 @@ namespace AutoMS
             {
                 var selectedCells = dataGridView3.SelectedCells;
 
+                var confirmResult = MessageBox.Show("Bạn có chắc chắn muốn xoá dữ liệu đã chọn?", "Xác nhận xoá dữ liệu", MessageBoxButtons.YesNo);
 
-                // Sử dụng một danh sách để lưu trữ các dòng đã được xoá để tránh lỗi khi xoá các ô
-                List<DataGridViewRow> rowsToRemove = new List<DataGridViewRow>();
-
-                foreach (DataGridViewCell cell in selectedCells)
+                if (confirmResult == DialogResult.Yes)
                 {
-                    DataGridViewRow row = cell.OwningRow;
+                    // Sử dụng một danh sách để lưu trữ các dòng đã được xoá để tránh lỗi khi xoá các ô
+                    List<DataGridViewRow> rowsToRemove = new List<DataGridViewRow>();
 
-                    if (!rowsToRemove.Contains(row))
+                    foreach (DataGridViewCell cell in selectedCells)
                     {
-                        rowsToRemove.Add(row);
+                        DataGridViewRow row = cell.OwningRow;
+
+                        if (!rowsToRemove.Contains(row))
+                        {
+                            rowsToRemove.Add(row);
+
+                            if (row.Cells["mAcc"].Value != null)
+                            {
+                                string folder = row.Cells["mAcc"].Value.ToString();
+                                string userNamePc = Environment.UserName;
+
+                                // Tạo đường dẫn đến thư mục profile của Chrome dựa trên tên người dùng
+                                string profilePath = "C:\\Users\\" + userNamePc + "\\AppData\\Local\\Google\\Chrome\\User Data";
+                                try
+                                {
+                                    // Sử dụng Process để gọi lệnh Command Prompt và sử dụng lệnh rd để xoá thư mục
+                                    ProcessStartInfo startInfo = new ProcessStartInfo("cmd.exe", "/c rd /s /q \"" + profilePath + "\"");
+                                    startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                    Process.Start(startInfo);
+                                }
+                                catch (Exception ex)
+                                {
+                                    string errorMessage = string.Format("Failed to delete profile \"{0}\". Error message: {1}", folder, ex.Message);
+                                    MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                        }
+                    }
+                    MessageBox.Show("Profile deleted successfully.");
+
+                    // Xoá các dòng đã được lưu trữ trong danh sách
+                    foreach (DataGridViewRow row in rowsToRemove)
+                    {
+                        dataGridView3.Rows.Remove(row);
                     }
                 }
-                // Xoá các dòng đã được lưu trữ trong danh sách
-                foreach (DataGridViewRow row in rowsToRemove)
-                {
-                    dataGridView3.Rows.Remove(row);
-                }
-
             }
         }
 

@@ -46,7 +46,7 @@ namespace AutoMS
                 {
                     slRow.Cells[6].Value = $"Seach Mobile: {count}/{key.Count()}";
                 }
-                slRow.Cells[6].Value = $"Seach: {count}/{key.Count()}";
+                //slRow.Cells[6].Value = $"Seach: {count}/{key.Count()}";
                 count++;
             }
             driver.Navigate().GoToUrl("https://rewards.bing.com/");
@@ -102,12 +102,9 @@ namespace AutoMS
             // Khởi tạo trình duyệt Chrome với cấu hình đã tạo
             IWebDriver driver = new ChromeDriver(service, options);
             List<string> wPC = await this.GetRandomWords(ws);
-            this.autoSearch(false,2000, wPC.ToArray(), driver, dt, e);
+            this.autoSearch(false,3000, wPC.ToArray(), driver, dt, e);
             string points = this.GetPoints(driver, mb);
-            if (mb == true)
-            {
-                driver.Quit();
-            }
+            
             return points;
         }
 
@@ -123,7 +120,7 @@ namespace AutoMS
             // Khởi tạo trình duyệt Chrome với cấu hình đã tạo
             IWebDriver driver = new ChromeDriver(service, options);
             List<string> wPC = await this.GetRandomWords(ws);
-            this.autoSearch(true,2000, wPC.ToArray(), driver, dt, e);
+            this.autoSearch(true, 3000, wPC.ToArray(), driver, dt, e);
             string points = this.GetPoints(driver, mb);
             driver.Quit();
             return points;
@@ -142,16 +139,16 @@ namespace AutoMS
 
             await Task.Run(async () =>
             {
-                // Thực hiện tìm kiếm trên PC
-                string point1 = await sPc(wsPc, email, width, height, notificationTextBox, useWindowSize, Mb, dt, e);
-                slRow.Cells[3].Value = point1;
                 // Thực hiện tìm kiếm trên Mobile
                 if (Mb)
                 {
                     Thread.Sleep(5000);
-                    string point2 = await sMb(wsMb, email, width, height, notificationTextBox, useWindowSize, dt, e);
-                    slRow.Cells[3].Value = point2;
+                    await sMb(wsMb, email, width, height, notificationTextBox, useWindowSize, dt, e);
+                    //slRow.Cells[3].Value = point2;
                 }
+                // Thực hiện tìm kiếm trên PC
+                string point1 = await sPc(wsPc, email, width, height, notificationTextBox, useWindowSize, Mb, dt, e);
+                slRow.Cells[3].Value = point1;
                 
 
             });
